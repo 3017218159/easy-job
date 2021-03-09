@@ -55,7 +55,15 @@
     
     <el-container>
       <el-header style="text-align: right; font-size: 12px">
-        
+        <span>
+          <div class="username">王小虎</div>
+          <el-dropdown @command="handleCommand">
+            <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </span>
       </el-header>
       
       <el-main>
@@ -67,6 +75,13 @@
 
 <script>
 export default {
+  methods: {
+    handleCommand(command) {
+      if(command === 'logout'){
+        this.$store.dispatch("users/logoutAsync");
+      }
+    }
+  }
 };
 </script>
 
@@ -76,6 +91,22 @@ export default {
 
   .el-header {
     background-color: rgb(170, 161, 206);
+
+    span {
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .username {
+        display: inline-block;
+      }
+      .el-avatar {
+        height: 40px;
+        width: 40px;
+        margin-left: 10px;
+      }
+    }
   }
   .el-aside {
     height: 100vh;

@@ -11,11 +11,19 @@ const actions = {
 
     commit("login");
   },
+  logoutAsync({ commit }) {
+    //发出异步请求
+
+    commit("logout");
+  }
 };
 const mutations = {
   login(state) {
     state.isLogin = true;
   },
+  logout(state) {
+    state.isLogin = false;
+  }
 };
 export default {
   namespaced: true,

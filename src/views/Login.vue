@@ -9,7 +9,7 @@
 export default {
   methods: {
     login() {
-      this.$store.dispatch('users/loginAsync');
+      this.$store.dispatch("users/loginAsync");
     },
   },
 };

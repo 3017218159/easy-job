@@ -4,11 +4,7 @@
       <Login />
     </div>
     <div v-else>
-      <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link>
-      </div>
-      <router-view />
+      <Home />
     </div>
   </div>
 </template>
@@ -16,9 +12,13 @@
 <script>
 import { mapState } from "vuex";
 import Login from './views/Login.vue';
+import Home from './views/Home.vue';
 
 export default {
-  components: { Login },
+  components: { 
+    Login,
+    Home,
+  },
   computed: {
     ...mapState({
       users: (state) => state.users,
@@ -37,18 +37,10 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 </style>

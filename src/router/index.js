@@ -1,17 +1,36 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Login from "../views/Login.vue";
+import InfoList from "../views/InfoList.vue";
+import Chat from "../views/Chat.vue";
+import Person from "../views/Person.vue";
+import Release from "../views/Release.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
-  // {
-  //   path: "/",
-  //   name: "Home",
-  //   component: Home,
-  // },
   {
     path: "/",
+    name: "InfoList",
+    component: InfoList,
+  },
+  {
+    path: "/chat",
+    name: "Chat",
+    component: Chat,
+  },
+  {
+    path: "/person",
+    name: "Person",
+    component: Person,
+  },
+  {
+    path: "/release",
+    name: "Release",
+    component: Release,
+  },
+  {
+    path: "/about",
     name: "About",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route

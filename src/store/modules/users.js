@@ -1,6 +1,6 @@
 const state = () => ({
   username: "未登录",
-  id: "",
+  phoneNumber: "",
   status: "", //STUDENT || ENTERPRISE
   password: "",
   isLogin: false,

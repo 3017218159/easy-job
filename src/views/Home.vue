@@ -48,8 +48,9 @@
         <span class="avatar-group">
           <div class="username">{{ users.username }}</div>
           <el-dropdown @command="handleCommand">
-            <el-avatar v-if="users.avatar" :src="users.avatar"></el-avatar>
-            <el-avatar v-else icon="el-icon-user-solid"></el-avatar>
+            <Avatar :imgUrl="users.avatar" />
+            <!-- <el-avatar v-if="users.avatar" :src="users.avatar"></el-avatar>
+            <el-avatar v-else icon="el-icon-user-solid"></el-avatar> -->
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
@@ -66,8 +67,10 @@
 
 <script>
 import { mapState } from "vuex";
+import Avatar from '../components/Avatar.vue';
 
 export default {
+  components: { Avatar },
   methods: {
     handleCommand(command) {
       if (command === "logout") {

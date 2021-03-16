@@ -1,5 +1,5 @@
 <template>
-  <el-card class="box-card">
+  <el-card class="box-card" shadow="hover">
     <div slot="header" class="clearfix">
       <Avatar :imgUrl="info.user.avatar" />
       <span class="username" v-if="type === 'STUDENT'">{{ info.user.name }}</span>

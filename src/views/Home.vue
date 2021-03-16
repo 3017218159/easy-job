@@ -44,7 +44,7 @@
     </el-aside>
 
     <el-container>
-      <el-header style="text-align: right; font-size: 12px">
+      <el-header class="home-header" style="text-align: right; font-size: 12px">
         <span class="avatar-group">
           <div class="username">{{ users.username }}</div>
           <el-dropdown @command="handleCommand">
@@ -90,7 +90,7 @@ export default {
 .home-container {
   height: 100vh;
 
-  .el-header {
+  .home-header {
     background-color: rgb(170, 161, 206);
 
     .avatar-group {

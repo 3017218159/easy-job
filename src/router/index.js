@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Login from "../views/Login.vue";
 import InfoList from "../views/InfoList.vue";
 import Chat from "../views/Chat.vue";
+import ChatDetail from "../views/ChatDetail.vue";
 import Person from "../views/Person.vue";
 import Release from "../views/Release.vue";
 
@@ -18,6 +19,11 @@ const routes = [
     path: "/chat",
     name: "Chat",
     component: Chat,
+  },
+  {
+    path: "/chat/detail",
+    name: "ChatDetail",
+    component: ChatDetail,
   },
   {
     path: "/person",

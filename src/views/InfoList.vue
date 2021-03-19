@@ -107,6 +107,10 @@ export default {
 
       .box-card {
         margin-top: 20px;
+
+        p {
+          word-break: break-word;
+        }
       }
       .username {
         margin-left: 10px;

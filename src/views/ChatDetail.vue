@@ -54,15 +54,15 @@ export default {
       sessionList: [
         {
           isMine: true,
-          content: "hello",
+          content: ["hello"],
         },
         {
           isMine: false,
-          content: "hello",
+          content: ["hello"],
         },
         {
           isMine: false,
-          content: "hello hello hello hello hello hello hello hello hello hello",
+          content: ["hello hello hello hello hello hello hello hello hello hello"],
         },
       ],
     };
@@ -73,6 +73,13 @@ export default {
     },
     onSend() {
       console.log("send");
+      if (this.inputText === "") {
+        return;
+      }
+      this.sessionList.push({
+        isMine: true,
+        content: this.inputText.split('\n'),
+      });
       this.inputText = "";
     },
   },

@@ -1,14 +1,22 @@
 <template>
   <div :class="'session-item' + className" v-if="isMine">
     <div class="chat-pop">
-      <p>{{ content }}</p>
+      <p>
+        <template v-for="(p, index) in content">
+          {{ p }}<br :key="index" />
+        </template>
+      </p>
     </div>
     <Avatar :imgUrl="fromAvatar" />
   </div>
   <div :class="'session-item' + className" v-else>
     <Avatar :imgUrl="toAvatar" />
     <div class="chat-pop">
-      <p>{{ content }}</p>
+      <p>
+        <template v-for="(p, index) in content">
+          {{ p }}<br :key="index" />
+        </template>
+      </p>
     </div>
   </div>
 </template>
@@ -21,7 +29,7 @@ export default {
     fromAvatar: String,
     toAvatar: String,
     isMine: Boolean,
-    content: String,
+    content: Array,
   },
   components: {
     Avatar,

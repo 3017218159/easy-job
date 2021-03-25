@@ -194,7 +194,7 @@ export default {
       this.$refs["loginForm"].validate((valid) => {
         if (valid) {
           //在这里进行登录操作
-          this.$store.dispatch("users/loginAsync");
+          this.$store.dispatch("users/loginAsync", '13311111111');
         } else {
           return false;
         }

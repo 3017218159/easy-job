@@ -23,9 +23,9 @@
           label-width="100px"
           v-if="loginForm.type === 'PASS'"
         >
-          <el-form-item label="手机号" prop="phoneNumber">
+          <el-form-item label="邮箱" prop="email">
             <el-input
-              v-model="loginForm.phoneNumber"
+              v-model="loginForm.email"
               autocomplete="off"
               clearable
             ></el-input>
@@ -56,9 +56,9 @@
           label-width="100px"
           v-else
         >
-          <el-form-item label="手机号" prop="phoneNumber">
+          <el-form-item label="邮箱" prop="email">
             <el-input
-              v-model="loginForm.phoneNumber"
+              v-model="loginForm.email"
               autocomplete="off"
               clearable
             ></el-input>
@@ -71,8 +71,9 @@
               style="width: 160px"
             ></el-input>
             <el-button
-              @click.prevent="getCode(loginForm.phoneNumber, 'loginForm')"
+              @click.prevent="getCode(loginForm.email, 'loginForm')"
               style="width: 110px"
+              :disabled="loginForm.disabled"
               >获取验证码</el-button
             >
           </el-form-item>
@@ -93,9 +94,16 @@
           ref="registerForm"
           label-width="100px"
         >
-          <el-form-item label="手机号" prop="phoneNumber">
+          <el-form-item label="用户名" prop="username">
             <el-input
-              v-model="registerForm.phoneNumber"
+              v-model="registerForm.username"
+              autocomplete="off"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input
+              v-model="registerForm.email"
               autocomplete="off"
               clearable
             ></el-input>
@@ -117,8 +125,9 @@
               style="width: 160px"
             ></el-input>
             <el-button
-              @click.prevent="getCode(registerForm.phoneNumber, 'registerForm')"
+              @click.prevent="getCode(registerForm.email, 'registerForm')"
               style="width: 110px"
+              :disabled="registerForm.disabled"
               >获取验证码</el-button
             >
           </el-form-item>
@@ -133,18 +142,18 @@
 
 <script>
 import { mapState } from "vuex";
-// import axios from 'axios';
+import axios from "axios";
 
 export default {
   data() {
-    const validatePhoneNumber = (rule, value, callback) => {
+    const validateEmail = (rule, value, callback) => {
       if (value === "") {
-        callback(new Error("请输入手机号"));
+        callback(new Error("请输入邮箱"));
       } else {
-        //验证手机号格式
-        const myreg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+        //验证邮箱格式
+        const myreg = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9]+\.)+(com|cn|net|org)$/;
         if (!myreg.test(value)) {
-          callback(new Error("手机号格式不正确"));
+          callback(new Error("邮箱格式不正确"));
         } else {
           callback();
         }
@@ -154,7 +163,11 @@ export default {
       if (value === "") {
         callback(new Error("请输入密码"));
       } else {
-        callback();
+        if (value.length < 6) {
+          callback(new Error("密码不得少于6个字符"));
+        } else {
+          callback();
+        }
       }
     };
     const validateCode = (rule, value, callback) => {
@@ -164,23 +177,34 @@ export default {
         callback();
       }
     };
+    const validateUsername = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入用户名"));
+      } else {
+        callback();
+      }
+    };
     return {
       loginForm: {
-        phoneNumber: "",
+        email: "",
         password: "",
         code: "",
         type: "PASS",
-        switchContent: "短信验证码登录",
+        switchContent: "邮箱验证码登录",
+        disabled: false,
       },
       registerForm: {
-        phoneNumber: "",
+        email: "",
         password: "",
         code: "",
+        username: "",
+        disabled: false,
       },
       rules: {
-        phoneNumber: [{ validator: validatePhoneNumber, trigger: "blur" }],
+        email: [{ validator: validateEmail, trigger: "blur" }],
         password: [{ validator: validatePassword, trigger: "blur" }],
         code: [{ validator: validateCode, trigger: "blur" }],
+        username: [{ validator: validateUsername, trigger: "blur" }],
       },
     };
   },
@@ -194,7 +218,24 @@ export default {
       this.$refs["loginForm"].validate((valid) => {
         if (valid) {
           //在这里进行登录操作
-          this.$store.dispatch("users/loginAsync", '13311111111');
+          axios
+            .get("/Users/login", {
+              params: {
+                email: this.loginForm.email,
+                password: this.loginForm.password,
+                type: this.loginForm.type,
+                status: this.$store.state.users.status,
+                code: this.loginForm.code,
+              },
+            })
+            .then((res) => {
+              const data = res.data;
+              if (data.status && data.status === "error") {
+                this.$message.error(data.message);
+              } else if (data.status && data.status === "success") {
+                this.$store.dispatch("users/loginAsync", this.loginForm.email);
+              }
+            });
         } else {
           return false;
         }
@@ -204,7 +245,28 @@ export default {
       this.$refs["registerForm"].validate((valid) => {
         if (valid) {
           //在这里进行注册操作
-          console.log("register");
+          axios
+            .get("/Users/register", {
+              params: {
+                email: this.registerForm.email,
+                password: this.registerForm.password,
+                username: this.registerForm.username,
+                status: this.$store.state.users.status,
+                code: this.registerForm.code,
+              },
+            })
+            .then((res) => {
+              const data = res.data;
+              if (data.status && data.status === "error") {
+                this.$message.error(data.message);
+              } else if (data.status && data.status === "success") {
+                this.$message({
+                  message: data.message,
+                  type: "success",
+                });
+                // this.$store.dispatch("users/loginAsync", this.loginForm.email);
+              }
+            });
         } else {
           return false;
         }
@@ -222,17 +284,34 @@ export default {
     setUserStatus(status) {
       this.$store.commit("users/setStatus", status);
     },
-    getCode(phoneNumber, formName) {
-      console.log(
-        this.$refs[formName].validateField("phoneNumber"),
-        phoneNumber,
-        formName
-      );
-      this.$refs[formName].validateField("phoneNumber", (msg) => {
-        // console.log(msg);
+    getCode(email, formName) {
+      if (formName === "registerForm") {
+        this.$refs[formName].validateField("username");
+        this.$refs[formName].validateField("password");
+      }
+      this.$refs[formName].validateField("email", (msg) => {
         if (!msg) {
           //在这里进行获取验证码操作
-          console.log("getCode", phoneNumber);
+          console.log("getCode", email);
+          axios
+            .get("/Users/getCode", {
+              params: {
+                email,
+                status: this.$store.state.users.status,
+                action: formName.split("Form")[0],
+              },
+            })
+            .then((res) => {
+              const data = res.data;
+              if (data.status && data.status === "error") {
+                this.$message.error(data.message);
+              }
+            });
+          this[formName].disabled = true;
+          const that = this;
+          setTimeout(() => {
+            that[formName].disabled = false;
+          }, 60000);
         } else {
           return false;
         }

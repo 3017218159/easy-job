@@ -11,15 +11,14 @@ const state = () => ({
   avatar: "",
 });
 const actions = {
-  loginAsync({ commit }, phoneNumber) {
-    console.log(phoneNumber);
+  loginAsync({ commit }, email) {
+    console.log(email);
     //发出异步请求
-    axios.get('http://localhost:8080/easy-job-back/Users/getUsers', {
+    axios.get('/Users/getUsers', {
       params: {
-        phoneNumber,
+        email,
       }
     }).then((res) => {
-      console.log(res);
       let data;
       if (typeof res.data === 'string') {
         data = JSON.parse(res.data);
@@ -27,9 +26,11 @@ const actions = {
         data = res.data;
       }
       if (data.status && data.status === 'error') {
-        throw new Error(data.message);
+        this.$message.error(data.message);
+      } else if (data.status && data.status === 'success') {
+        const users = data.message;
+        commit("setUsers", users);
       }
-      commit("setUsers", data);
     })
     commit("login");
   },

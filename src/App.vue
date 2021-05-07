@@ -26,6 +26,7 @@ export default {
   },
   beforeDestroy () {
     console.log('byebye');
+    this.$store.dispatch("users/logoutAsync");
   }
 };
 </script>

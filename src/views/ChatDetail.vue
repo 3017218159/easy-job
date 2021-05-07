@@ -44,25 +44,34 @@ export default {
   components: {
     SessionItem,
   },
+  mounted() {
+    console.log(this.$route.query);
+    this.toName = this.$route.query.toName;
+    this.toName = "王五";
+  },
   data() {
     return {
-      toName: this.$route.query.toName,
+      toName: "this.$route.query.toName",
       fromAvatar:
         "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-      toAvatar: "",
+      toAvatar: "https://img0.baidu.com/it/u=229157680,1590894473&fm=26&fmt=auto&gp=0.jpg",
       inputText: "",
       sessionList: [
         {
           isMine: true,
-          content: ["hello"],
+          content: ["您好，我是田金大学软件工程专业的蔡苟，想向您了解一下这个职位"],
         },
         {
           isMine: false,
-          content: ["hello"],
+          content: ["OK，我们是企鹅科技有限公司的游戏部门，正在急招游戏开发工程师"],
         },
         {
           isMine: false,
-          content: ["hello hello hello hello hello hello hello hello hello hello"],
+          content: ["我看到您这边的信息比较适合我们的岗位，方便发一份简历过来吗"],
+        },
+        {
+          isMine: true,
+          content: ["好的，谢谢您"],
         },
       ],
     };

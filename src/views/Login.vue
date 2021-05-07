@@ -233,8 +233,11 @@ export default {
               if (data.status && data.status === "error") {
                 this.$message.error(data.message);
               } else if (data.status && data.status === "success") {
-                this.$store.dispatch("users/loginAsync", this.loginForm.email);
+                this.$store.dispatch("users/loginAsync", {email: this.loginForm.email, status:this.$store.state.users.status});
               }
+            })
+            .catch(() => {
+              this.$message.error("请求失败，请检查网络");
             });
         } else {
           return false;
@@ -266,6 +269,9 @@ export default {
                 });
                 // this.$store.dispatch("users/loginAsync", this.loginForm.email);
               }
+            })
+            .catch(() => {
+              this.$message.error("请求失败，请检查网络");
             });
         } else {
           return false;
@@ -306,6 +312,9 @@ export default {
               if (data.status && data.status === "error") {
                 this.$message.error(data.message);
               }
+            })
+            .catch(() => {
+              this.$message.error("请求失败，请检查网络");
             });
           this[formName].disabled = true;
           const that = this;

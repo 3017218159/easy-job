@@ -19,6 +19,10 @@
           <i class="el-icon-user"></i>
           <span slot="title">个人中心</span>
         </el-menu-item>
+        <el-menu-item index="/release">
+          <i class="el-icon-edit-outline"></i>
+          <span slot="title">电子简历</span>
+        </el-menu-item>
       </el-menu>
       <el-menu class="nav" :router="true" :default-active="$route.path" v-else>
         <el-menu-item index="/">

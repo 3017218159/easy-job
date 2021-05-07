@@ -2,21 +2,23 @@ import axios from "axios";
 
 const state = () => ({
   id: 0,
-  username: "未登录",
+  username: "蔡苟",
   phoneNumber: "",
   status: "", //STUDENT || ENTERPRISE
   password: "",
   isLogin: false,
-  // avatar: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-  avatar: "",
+  // isLogin: true,
+  avatar: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+  // avatar: "",
 });
 const actions = {
-  loginAsync({ commit }, email) {
-    console.log(email);
+  loginAsync({ commit }, data) {
+    console.log(data);
     //发出异步请求
     axios.get('/Users/getUsers', {
       params: {
-        email,
+        email: data.email,
+        status: data.status
       }
     }).then((res) => {
       let data;

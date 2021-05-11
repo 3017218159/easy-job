@@ -110,7 +110,7 @@ export default {
           },
         })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           const list = res.data.message;
           this.chatList = [];
           list.forEach((e) => {

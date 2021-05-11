@@ -79,6 +79,7 @@ export default {
     handleCommand(command) {
       if (command === "logout") {
         this.$store.dispatch("users/logoutAsync");
+        this.$store.commit("websocket/close");
       }
     },
   },

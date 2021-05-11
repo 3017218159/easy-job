@@ -224,7 +224,7 @@ export default {
                 email: this.loginForm.email,
                 password: this.loginForm.password,
                 type: this.loginForm.type,
-                status: this.$store.state.users.status,
+                status: this.users.status,
                 code: this.loginForm.code,
               },
             })
@@ -233,7 +233,18 @@ export default {
               if (data.status && data.status === "error") {
                 this.$message.error(data.message);
               } else if (data.status && data.status === "success") {
-                this.$store.dispatch("users/loginAsync", {email: this.loginForm.email, status:this.$store.state.users.status});
+                this.$store.dispatch("users/loginAsync", {
+                  email: this.loginForm.email,
+                  status: this.users.status,
+                });
+                //等待store中信息更新，之后进行websocket初始化
+                let interval = setInterval(() => {
+                  if (this.users.id !== 0) {
+                    // this.getPersonInfo();
+                    this.$store.commit("websocket/init", this.users.id);
+                    clearInterval(interval);
+                  }
+                }, 1000);
               }
             })
             .catch(() => {

@@ -50,34 +50,101 @@ export default {
     // console.log(this.$route.params);
     if (Object.getOwnPropertyNames(this.$route.params).length == 0) {
       this.$router.push({ name: "Chat" });
+    } else {
+      this.sessionId = this.$route.params.sessionId;
+      this.getHistory();
     }
-    this.getHistory();
   },
   computed: {
     ...mapState({
       users: (state) => state.users,
+      websocket: (state) => state.websocket,
     }),
+    msgList() {
+      return this.websocket.msgList;
+    },
+  },
+  watch: {
+    msgList() {
+      // console.log(this.websocket.msgList);
+      const list = this.websocket.msgList.filter(
+        (e) => e.sessionId == this.sessionId
+      );
+      list.forEach((e) => {
+        this.sessionList.push({
+          isMine: e.fromId == this.users.id,
+          content: e.message.split("\n"),
+        });
+      });
+      if (list.length !== 0) {
+        this.$store.commit("websocket/popMsgList", this.sessionId);
+      }
+    },
   },
   data() {
     return {
+      sessionId: "",
       inputText: "",
       sessionList: [],
     };
   },
   methods: {
+    formatTime(time) {
+      let d = new Date(time);
+      return (
+        d.getFullYear() +
+        "-" +
+        (d.getMonth() + 1 > 9 ? d.getMonth() + 1 : "0" + (d.getMonth() + 1)) +
+        "-" +
+        (d.getDate() > 9 ? d.getDate() : "0" + d.getDate()) +
+        " " +
+        (d.getHours() > 9 ? d.getHours() : "0" + d.getHours()) +
+        ":" +
+        (d.getMinutes() > 9 ? d.getMinutes() : "0" + d.getMinutes()) +
+        ":" +
+        (d.getSeconds() > 9 ? d.getSeconds() : "0" + d.getSeconds())
+      );
+    },
     goBack() {
       this.$router.push("/chat");
     },
     onSend() {
-      console.log("send");
       if (this.inputText === "") {
         return;
       }
-      this.sessionList.push({
-        isMine: true,
-        content: this.inputText.split("\n"),
-      });
+      const message = this.inputText.split("\n").join("\\\\n");
+      const fromId = this.users.id;
+      const toId = this.$route.params.userId;
+      const datetime = this.formatTime(new Date());
+      const msg =
+        '{"sessionId":"' +
+        this.sessionId +
+        '", "fromId":"' +
+        fromId +
+        '", "toId":"' +
+        toId +
+        '", "message":"' +
+        message +
+        '", "datetime":"' +
+        datetime +
+        '"}';
+      this.$store.commit("websocket/send", msg);
+      this.sendMessage(msg);
       this.inputText = "";
+    },
+    sendMessage(msg) {
+      const param = JSON.parse(msg);
+      // console.log(param);
+      axios
+        .get("/Chat/sendMessage", {
+          params: param,
+        })
+        .then(() => {
+          // console.log(res);
+        })
+        .catch(() => {
+          this.$message.error("请求失败，请检查网络");
+        });
     },
     getHistory() {
       axios
@@ -89,13 +156,15 @@ export default {
           },
         })
         .then((res) => {
-          console.log(res);
-          const list = res.data.message;
-          list.forEach(e => {
+          // console.log(res);
+          const list = res.data.message.history;
+          this.sessionId = res.data.message.sessionId;
+          this.sessionList = [];
+          list.forEach((e) => {
             this.sessionList.push({
               isMine: Boolean(parseInt(e.isMine)),
-              content: e.content.split('\n'),
-            })
+              content: e.content.split("\n"),
+            });
           });
         })
         .catch(() => {

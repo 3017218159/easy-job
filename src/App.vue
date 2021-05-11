@@ -27,6 +27,7 @@ export default {
   beforeDestroy () {
     console.log('byebye');
     this.$store.dispatch("users/logoutAsync");
+    this.$store.commit("websocket/close");
   }
 };
 </script>

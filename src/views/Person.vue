@@ -9,7 +9,7 @@
     <el-form-item label="头像">
       <el-upload
         class="avatar-uploader"
-        action="https://jsonplaceholder.typicode.com/posts/"
+        action="http://localhost:8080/easy-job-back/Person/updateAvatar"
         :show-file-list="false"
         :on-success="handleAvatarSuccess"
         :before-upload="beforeAvatarUpload"
@@ -51,7 +51,7 @@
     <el-form-item label="专业">
       <el-input v-model="studentForm.major" :disabled="isEdit"></el-input>
     </el-form-item>
-    <el-form-item label="职业技能">
+    <!-- <el-form-item label="职业技能">
       <el-input
         type="textarea"
         v-model="studentForm.skill"
@@ -67,7 +67,7 @@
     </el-form-item>
     <el-form-item label="期望职位">
       <el-input v-model="studentForm.position" :disabled="isEdit"></el-input>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item>
       <el-button type="primary" @click="onSubmit">{{ btnText }}</el-button>
     </el-form-item>
@@ -82,7 +82,7 @@
     <el-form-item label="头像">
       <el-upload
         class="avatar-uploader"
-        action="https://jsonplaceholder.typicode.com/posts/"
+        action="http://localhost:8080/easy-job-back/Person/updateAvatar"
         :show-file-list="false"
         :on-success="handleAvatarSuccess"
         :before-upload="beforeAvatarUpload"
@@ -131,6 +131,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import { mapState } from "vuex";
 
 export default {
@@ -138,6 +139,7 @@ export default {
     return {
       isEdit: true,
       btnText: "编辑",
+      imageUrl: "",
       studentForm: {
         avatar: "",
         name: "",
@@ -145,9 +147,6 @@ export default {
         birth: "",
         school: "",
         major: "",
-        skill: "",
-        experience: "",
-        position: "",
       },
       enterpriseForm: {
         avatar: "",
@@ -159,33 +158,97 @@ export default {
       },
     };
   },
+  mounted() {
+    // console.log(this.$store.state.users);
+    if (this.users.id !== 0) {
+      this.getPersonInfo();
+    } else {
+      let interval = setInterval(() => {
+        if (this.users.id !== 0) {
+          this.getPersonInfo();
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
+  },
   computed: {
     ...mapState({
       users: (state) => state.users,
     }),
   },
-  beforeMount() {
-    // console.log(this.users);
-  },
   methods: {
+    formatTime(time) {
+      let d = new Date(time);
+      return (
+        d.getFullYear() +
+        "-" +
+        ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : ("0" + (d.getMonth() + 1))) +
+        "-" +
+        (d.getDate() > 9 ? d.getDate() : ("0" + d.getDate())) +
+        " " +
+        (d.getHours() > 9 ? d.getHours() : ("0" + d.getHours())) +
+        ":" +
+        (d.getMinutes() > 9 ? d.getMinutes() : ("0" + d.getMinutes())) +
+        ":" +
+        (d.getSeconds() > 9 ? d.getSeconds() : ("0" + d.getSeconds()))
+      );
+    },
     onSubmit() {
-      console.log("submit!", this.users);
       if (this.isEdit) {
         this.isEdit = false;
         this.btnText = "提交";
       } else {
-        if (this.users.status === "STUDENT") {
-          this.$alert(
-            "提交后你的信息将会被展示给企业招聘者，完善的信息有利于提高就业机会",
-            "提示",
-            {
-              confirmButtonText: "确定",
+        this.$confirm("确定提交修改？", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+        })
+          .then(() => {
+            // console.log('ok');
+            if (this.users.status === "STUDENT") {
+              this.updatePersonInfo(this.studentForm, "STUDENT");
+            } else if (this.users.status === "ENTERPRISE") {
+              this.updatePersonInfo(this.enterpriseForm, "ENTERPRISE");
             }
-          );
-        }
+          })
+          .catch(() => {
+            // console.log('no');
+            this.getPersonInfo();
+          });
         this.isEdit = true;
         this.btnText = "编辑";
       }
+    },
+    getPersonInfo() {
+      axios
+        .get("/Person/getUserInfo", {
+          params: {
+            userId: this.users.id,
+            status: this.users.status,
+          },
+        })
+        .then((res) => {
+          // console.log(res);
+          this.studentForm = res.data.message;
+        })
+        .catch(() => {
+          this.$message.error("请求失败，请检查网络");
+        });
+    },
+    updatePersonInfo(info, status) {
+      axios
+        .get("/Person/updateUserInfo", {
+          params: Object.assign({}, info, {
+            status,
+            birth: this.formatTime(info.birth),
+          }),
+        })
+        .then((res) => {
+          console.log(res);
+          this.getPersonInfo();
+        })
+        .catch(() => {
+          this.$message.error("请求失败，请检查网络");
+        });
     },
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
@@ -200,6 +263,7 @@ export default {
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
+      console.log("file", file);
       return isLt2M;
     },
   },

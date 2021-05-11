@@ -1,13 +1,13 @@
 <template>
   <div class="chat-detail">
-    <el-page-header @back="goBack" :content="`与 ${toName} 的聊天`">
+    <el-page-header @back="goBack" :content="`与 ${$route.params.name} 的聊天`">
     </el-page-header>
     <div class="chat-main">
       <ul class="session-list">
         <li v-for="(item, index) in sessionList" :key="index">
           <session-item
-            :fromAvatar="fromAvatar"
-            :toAvatar="toAvatar"
+            :fromAvatar="users.avatar"
+            :toAvatar="$route.params.avatar"
             :isMine="item.isMine"
             :content="item.content"
           />
@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import { mapState } from "vuex";
 import SessionItem from "../components/SessionItem.vue";
 
 export default {
@@ -45,35 +47,21 @@ export default {
     SessionItem,
   },
   mounted() {
-    console.log(this.$route.query);
-    this.toName = this.$route.query.toName;
-    this.toName = "王五";
+    // console.log(this.$route.params);
+    if (Object.getOwnPropertyNames(this.$route.params).length == 0) {
+      this.$router.push({ name: "Chat" });
+    }
+    this.getHistory();
+  },
+  computed: {
+    ...mapState({
+      users: (state) => state.users,
+    }),
   },
   data() {
     return {
-      toName: "this.$route.query.toName",
-      fromAvatar:
-        "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-      toAvatar: "https://img0.baidu.com/it/u=229157680,1590894473&fm=26&fmt=auto&gp=0.jpg",
       inputText: "",
-      sessionList: [
-        {
-          isMine: true,
-          content: ["您好，我是田金大学软件工程专业的蔡苟，想向您了解一下这个职位"],
-        },
-        {
-          isMine: false,
-          content: ["OK，我们是企鹅科技有限公司的游戏部门，正在急招游戏开发工程师"],
-        },
-        {
-          isMine: false,
-          content: ["我看到您这边的信息比较适合我们的岗位，方便发一份简历过来吗"],
-        },
-        {
-          isMine: true,
-          content: ["好的，谢谢您"],
-        },
-      ],
+      sessionList: [],
     };
   },
   methods: {
@@ -87,9 +75,32 @@ export default {
       }
       this.sessionList.push({
         isMine: true,
-        content: this.inputText.split('\n'),
+        content: this.inputText.split("\n"),
       });
       this.inputText = "";
+    },
+    getHistory() {
+      axios
+        .get("/Chat/getHistory", {
+          params: {
+            sessionId: this.$route.params.sessionId,
+            user1Id: this.users.id,
+            user2Id: this.$route.params.userId,
+          },
+        })
+        .then((res) => {
+          console.log(res);
+          const list = res.data.message;
+          list.forEach(e => {
+            this.sessionList.push({
+              isMine: Boolean(parseInt(e.isMine)),
+              content: e.content.split('\n'),
+            })
+          });
+        })
+        .catch(() => {
+          this.$message.error("请求失败，请检查网络");
+        });
     },
   },
 };

@@ -155,9 +155,9 @@ export default {
     this.getInfos(this.currentCate);
   },
   methods: {
-    toChat(id) {
-      console.log("chat to", id);
-      this.$router.push("/chat");
+    toChat(toUser) {
+      // console.log("chat to", toUser);
+      this.$router.push({ name: "ChatDetail", params: toUser });
     },
     handleSizeChange(val) {
       this.pageSize = val;
@@ -176,7 +176,7 @@ export default {
       axios.get("/Square/getInfos", {
         params: {
           categary: val,
-          userType: this.$store.state.users.status,
+          userType: this.users.status,
           offset: this.currentPage,
           pageSize: this.pageSize
         }

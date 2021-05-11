@@ -2,18 +2,18 @@ import axios from "axios";
 
 const state = () => ({
   id: 0,
-  username: "蔡苟",
-  phoneNumber: "",
+  username: "未登录",
+  email: "",
   status: "", //STUDENT || ENTERPRISE
   password: "",
   isLogin: false,
   // isLogin: true,
-  avatar: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-  // avatar: "",
+  // avatar: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+  avatar: "",
 });
 const actions = {
   loginAsync({ commit }, data) {
-    console.log(data);
+    // console.log(data);
     //发出异步请求
     axios.get('/Users/getUsers', {
       params: {
@@ -21,6 +21,7 @@ const actions = {
         status: data.status
       }
     }).then((res) => {
+      // console.log('getUsers', res);
       let data;
       if (typeof res.data === 'string') {
         data = JSON.parse(res.data);
@@ -48,7 +49,12 @@ const mutations = {
   },
   logout(state) {
     state.isLogin = false;
-    state.status = '';
+    state.id = 0;
+    state.username = "未登录";
+    state.password = "";
+    state.email = "";
+    state.status = "";
+    state.avatar = "";
   },
   setStatus(state, status) {
     state.status = status;
@@ -57,8 +63,9 @@ const mutations = {
     state.id = users.id;
     state.username = users.username;
     state.password = users.password;
-    state.phoneNumber = users.phoneNumber;
+    state.email = users.email;
     state.status = users.status;
+    state.avatar = users.avatar;
   }
 };
 export default {

@@ -15,7 +15,7 @@
       <el-button
         style="float: right; padding: 10px 10px"
         type="text"
-        @click="openDetail"
+        @click="toChat"
       >
         聊天
       </el-button>
@@ -92,15 +92,18 @@ export default {
       requirementList: [],
     };
   },
-  mounted() {
-    
-  },
+  mounted() {},
   components: {
     Avatar,
   },
   methods: {
     toChat() {
-      this.$emit("onToChat", this.info.user.id);
+      // console.log(this.info);
+      this.$emit("onToChat", {
+        userId: this.info.user.userId,
+        name: this.info.user.name,
+        avatar: this.info.user.avatar,
+      });
     },
     openDetail() {
       this.detailVisible = true;
